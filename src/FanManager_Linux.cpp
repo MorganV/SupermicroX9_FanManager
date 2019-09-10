@@ -8,15 +8,14 @@
 #include <string>
 #include <array>
 #include <sstream>
-#include <thread>
-#include "conslsvc.h"
+#include <cmath>
 
 using namespace std;
 
 string performCMD(string command) {
 	array<char, 128> buffer;
 	string result;
-	unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(&command.at(0), "r"), _pclose);
+	unique_ptr<FILE, decltype(&pclose)> pipe(popen(&command.at(0), "r"), pclose);
 	if (!pipe) {
 		throw runtime_error("popen() failed!");
 	}
@@ -99,9 +98,3 @@ int main()
 	return 0;
 }
 
-
-
-class FanManagerService : TConsoleService<FileLogger> {
-
-
-};

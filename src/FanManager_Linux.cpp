@@ -36,9 +36,8 @@ double calculateFanSpeed(double temp_CPU1, double temp_CPU2) {
 string toHexStr(int value) { ostringstream oss; oss << hex << value; return oss.str(); }
 
 void getTemps(double& temp1, double& temp2) {
-	string cmd = performCMD("ipmiutil sensor -c | grep CPU");
+	string cmd = performCMD("sudo ipmiutil sensor -c | grep CPU");
 	istringstream stream(cmd);
-
 	string buf;
 	getline(stream, buf, '|');
 	getline(stream, buf, '|');
@@ -63,7 +62,6 @@ const int WAIT_MAPPINGS[]{ 0, 5, 10, 10, 15};		   	//minimum fan speed cycles be
 																	//one cycle is a few seconds
 int main()
 {
-	performCMD("IPMICFG -fan 1"); //default to full before calculation completes
 	int prevSpeed = 255;
 	int cycleSkipCount = 0;
 	while (1) {
@@ -82,12 +80,12 @@ int main()
 			cycleSkipCount = WAIT_MAPPINGS[i];
 			prevSpeed = setSpeed;
 			//set higher speed
-			performCMD("IPMICFG -raw 0x30 0x91 0x5A 0x3 0x10 0x" + toHexStr(setSpeed));
+			performCMD("sudo ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0x" + toHexStr(setSpeed));
 			cout << "Setting higher speed: " << setSpeed << endl;
 		}
 		else if (cycleSkipCount <= 0 && setSpeed<prevSpeed) {
 		//set lower speed
-			performCMD("IPMICFG -raw 0x30 0x91 0x5A 0x3 0x10 0x" +toHexStr(setSpeed));
+			performCMD("sudo ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0x" +toHexStr(setSpeed));
 			cout << "Setting lower speed: " << setSpeed << endl;
 			prevSpeed = setSpeed;
 		}
